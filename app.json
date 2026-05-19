@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Acolhe+",
+    "slug": "acolhe-plus",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.acolheplus.app"
+    },
+    "android": {
+      "package": "com.acolheplus.app"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
