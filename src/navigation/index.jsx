@@ -8,12 +8,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   View, Text, TextInput, TouchableOpacity,
   ScrollView, StyleSheet, ActivityIndicator,
-  FlatList, Modal, Pressable,
+  FlatList, Modal, Pressable, Image,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAuth } from '../context/AuthContext'
-import { colors, spacing, radius, fontSize, fontWeight, shadow } from '../theme'
+import { colors, spacing, radius, fontSize, fontWeight, shadow, fontFamily } from '../theme'
 import { PSYCHOLOGISTS, AUDIENCE_OPTIONS, PROFESSION_OPTIONS } from '../data/psychologists'
 
 // ─── BottomTabBar ─────────────────────────────────────────────────────────────
@@ -63,12 +63,12 @@ function BottomTabBar({ state, descriptors, navigation }) {
 }
 
 const btb = StyleSheet.create({
-  container: { flexDirection: 'row', backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 8, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 12 },
-  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 4, minHeight: 44 },
-  iconWrap: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  container: { flexDirection: 'row', backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10, shadowColor: '#1F2D1F', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 14 },
+  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 4, minHeight: 48 },
+  iconWrap: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
   iconWrapActive: { backgroundColor: colors.primaryLight },
-  label: { fontSize: 11, fontWeight: '500', color: colors.textLight, marginTop: 2 },
-  labelActive: { color: colors.primary, fontWeight: '600' },
+  label: { fontSize: 11, fontFamily: fontFamily.medium, color: colors.textLight, marginTop: 3 },
+  labelActive: { color: colors.primary, fontFamily: fontFamily.bold },
 })
 
 // ─── Placeholders ────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ function Placeholder({ name }) {
 }
 const ph = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
-  text: { fontSize: 22, fontWeight: '700', color: '#2e7d32' },
+  text: { fontSize: 22, fontFamily: fontFamily.bold, color: '#2e7d32' },
   sub: { fontSize: 14, color: '#7a937a', marginTop: 6 },
 })
 
@@ -117,6 +117,29 @@ const PROFILES = [
   { id: 'empresa', title: 'Benefício corporativo', subtitle: 'Até R$ 50 por colaborador', description: 'Empresas parceiras subsidiam consultas de saúde mental.', color: '#fce4ec', accent: '#ad1457' },
 ]
 
+// ─── Mesh Gradient Hero ──────────────────────────────────────────────────────
+
+function MeshGradient({ height = 320 }) {
+  return (
+    <View style={[StyleSheet.absoluteFillObject, { height, overflow: 'hidden' }]}>
+      {/* Fundo base */}
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#F0F9F0' }} />
+      {/* Bolha 1 — centro */}
+      <View style={{ position: 'absolute', width: 300, height: 300, borderRadius: 150, backgroundColor: '#C8E6C9', opacity: 0.5, top: -60, left: '10%' }} />
+      {/* Bolha 2 — topo esquerda */}
+      <View style={{ position: 'absolute', width: 220, height: 220, borderRadius: 110, backgroundColor: '#A5D6A7', opacity: 0.35, top: -80, left: -60 }} />
+      {/* Bolha 3 — direita baixo */}
+      <View style={{ position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: '#B9F6CA', opacity: 0.3, bottom: -60, right: -40 }} />
+      {/* Bolha 4 — topo direita */}
+      <View style={{ position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: '#DCEDC8', opacity: 0.4, top: -40, right: -20 }} />
+      {/* Onda suave de fundo */}
+      <View style={{ position: 'absolute', width: 500, height: 200, borderRadius: 100, backgroundColor: '#E8F5E9', opacity: 0.6, bottom: 20, left: -80, transform: [{ rotate: '-8deg' }] }} />
+    </View>
+  )
+}
+
+// ─── Home Screen ──────────────────────────────────────────────────────────────
+
 function HomeScreen({ navigation }) {
   const [search, setSearch] = useState('')
   const { isAuthenticated, user } = useAuth()
@@ -127,13 +150,41 @@ function HomeScreen({ navigation }) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    <View style={{ flex: 1, backgroundColor: '#F6FBF6' }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-        <View style={[hs.hero, { paddingTop: insets.top + 24 }]}>
-          {isAuthenticated && <Text style={hs.greeting}>Olá, {user?.name?.split(' ')[0]}</Text>}
-          <Text style={hs.heroTitle}>Encontre seu{'\n'}profissional</Text>
-          <Text style={hs.heroSub}>Psicólogos, psicanalistas e psiquiatras{'\n'}a partir de R$ 50/sessão</Text>
+        <View style={[hs.hero, { paddingTop: insets.top + 16 }]}>
+          <MeshGradient height={300} />
 
+          {/* Layout: esquerda (logo+texto) | direita (ilustração) */}
+          <View style={hs.heroInner}>
+
+            {/* Coluna esquerda */}
+            <View style={hs.heroLeft}>
+              <Image source={require('../../assets/logo.png')} style={hs.heroLogo} resizeMode="contain" />
+              {isAuthenticated && <Text style={hs.greeting}>Olá, {user?.name?.split(' ')[0]}</Text>}
+              <Text style={hs.heroTitle}>Encontre seu{'\n'}profissional</Text>
+              <Text style={hs.heroSub}>Psicólogos, psicanalistas e psiquiatras a partir de <Text style={{ fontFamily: fontFamily.bold, color: colors.primary }}>R$ 50/sessão</Text></Text>
+            </View>
+
+            {/* Coluna direita — ilustração */}
+            <View style={hs.heroRight}>
+              {isAuthenticated && (
+                <View style={hs.notifBtn}>
+                  <Feather name='bell' size={18} color={colors.primary} />
+                  <View style={hs.notifBadge}><Text style={hs.notifBadgeText}>3</Text></View>
+                </View>
+              )}
+              <Image
+                source={require('../../assets/illustration.png')}
+                style={hs.heroIllustration}
+                resizeMode="contain"
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Busca e chips fora do hero */}
+        <View style={hs.searchSection}>
           <View style={hs.searchRow}>
             <View style={hs.searchBox}>
               <Feather name='search' size={16} color={colors.textLight} style={{ marginRight: 8 }} />
@@ -143,8 +194,7 @@ function HomeScreen({ navigation }) {
               <Text style={hs.searchBtnText}>Buscar</Text>
             </TouchableOpacity>
           </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }} contentContainerStyle={{ gap: 8, paddingRight: 16 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 16 }}>
             {CHIPS.map(chip => (
               <TouchableOpacity key={chip.label} style={hs.chip} onPress={() => goToSearch({ q: chip.label })} activeOpacity={0.7}>
                 <Text style={hs.chipText}>{chip.label}</Text>
@@ -158,8 +208,8 @@ function HomeScreen({ navigation }) {
           <View style={hs.specialtyGrid}>
             {SPECIALTIES.map(sp => (
               <TouchableOpacity key={sp.label} style={hs.specialtyCard} onPress={() => goToSearch({ especialidade: sp.label })} activeOpacity={0.7}>
-                <Feather name={sp.icon} size={24} color={colors.primary} style={{ marginBottom: 4 }} />
-                <Text style={hs.specialtyLabel}>{sp.label}</Text>
+                <Feather name={sp.icon} size={22} color={colors.primary} style={{ marginBottom: 4 }} />
+                <Text style={hs.specialtyLabel} numberOfLines={2}>{sp.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -175,7 +225,7 @@ function HomeScreen({ navigation }) {
                   <Text style={[hs.profileTitle, { color: p.accent }]}>{p.title}</Text>
                   <Text style={[hs.profileSubtitle, { color: p.accent }]}>{p.subtitle}</Text>
                 </View>
-                <Text style={{ fontSize: 28, color: p.accent, fontWeight: '700' }}>›</Text>
+                <Text style={{ fontSize: 28, color: p.accent, fontFamily: fontFamily.bold }}>›</Text>
               </View>
               <Text style={hs.profileDesc}>{p.description}</Text>
             </TouchableOpacity>
@@ -197,31 +247,46 @@ function HomeScreen({ navigation }) {
 }
 
 const hs = StyleSheet.create({
-  hero: { backgroundColor: colors.primaryLight, paddingHorizontal: 24, paddingBottom: 24 },
-  greeting: { fontSize: 13, color: colors.primaryDark, fontWeight: '500', marginBottom: 4 },
-  heroTitle: { fontSize: 32, fontWeight: '800', color: colors.primaryDark, lineHeight: 40, marginBottom: 8 },
-  heroSub: { fontSize: 15, color: colors.textSecondary, lineHeight: 22, marginBottom: 16 },
-  searchRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-  searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bg, borderRadius: 16, paddingHorizontal: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.07, shadowRadius: 3, elevation: 2 },
-  searchInput: { flex: 1, height: 44, fontSize: 15, color: colors.text },
-  searchBtn: { backgroundColor: colors.primary, borderRadius: 16, paddingHorizontal: 16, height: 44, alignItems: 'center', justifyContent: 'center' },
-  searchBtnText: { color: '#fff', fontWeight: '600', fontSize: 13 },
-  chip: { backgroundColor: colors.bg, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
-  chipText: { fontSize: 13, color: colors.primary, fontWeight: '500' },
-  section: { paddingHorizontal: 24, paddingTop: 24 },
-  sectionTitle: { fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 12 },
-  specialtyGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  specialtyCard: { width: '22%', aspectRatio: 1, backgroundColor: colors.bgLight, borderRadius: 12, alignItems: 'center', justifyContent: 'center', padding: 8 },
-  specialtyLabel: { fontSize: 10, color: colors.textSecondary, fontWeight: '500', textAlign: 'center' },
-  profileCard: { borderRadius: 16, padding: 16, marginBottom: 12 },
-  profileTitle: { fontSize: 15, fontWeight: '700' },
-  profileSubtitle: { fontSize: 13, fontWeight: '500', opacity: 0.8 },
-  profileDesc: { fontSize: 13, color: colors.textSecondary, lineHeight: 20 },
-  ctaBox: { margin: 24, backgroundColor: colors.primaryDark, borderRadius: 16, padding: 24, alignItems: 'center' },
-  ctaTitle: { fontSize: 20, fontWeight: '700', color: '#fff', marginBottom: 8 },
-  ctaSub: { fontSize: 13, color: 'rgba(255,255,255,0.8)', textAlign: 'center', marginBottom: 16 },
-  ctaBtn: { backgroundColor: '#fff', borderRadius: 999, paddingHorizontal: 24, paddingVertical: 12 },
-  ctaBtnText: { color: colors.primaryDark, fontWeight: '700', fontSize: 15 },
+  hero: { overflow: 'hidden', paddingHorizontal: 20, paddingBottom: 24, backgroundColor: colors.primaryLight, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  heroInner: { flexDirection: 'row', alignItems: 'center' },
+  heroLeft: { flex: 1, paddingRight: 8, zIndex: 10 },
+  heroRight: { width: 180, alignItems: 'flex-end', zIndex: 10 },
+  heroLogo: { width: '100%', height: 90, marginBottom: 10 },
+  heroLogoSmall: { width: 290, height: 68 },
+  heroIllustration: { width: 200, height: 240, marginRight: -10, marginBottom: -24 },
+  heroIllustrationBg: { position: 'absolute', right: -20, top: 0, width: '82%', height: '100%', zIndex: 1 },
+  heroOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 2, backgroundColor: 'rgba(240,249,240,0.45)' },
+  heroTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, zIndex: 10 },
+  logoRow: { flexDirection: 'row', alignItems: 'center' },
+  notifBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center', marginBottom: 8, alignSelf: 'flex-end' },
+  notifBadge: { position: 'absolute', top: -2, right: -2, width: 16, height: 16, borderRadius: 8, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  notifBadgeText: { fontSize: 9, color: '#fff', fontFamily: fontFamily.bold },
+  heroContent: { zIndex: 10, width: '60%' },
+  greeting: { fontSize: 13, color: colors.primaryMid, fontFamily: fontFamily.semibold, marginBottom: 4 },
+  heroTitle: { fontSize: 34, fontFamily: fontFamily.bold, color: colors.primaryDark, lineHeight: 42, marginBottom: 10 },
+  heroSub: { fontSize: 13, color: colors.textSecondary, lineHeight: 20 },
+  searchSection: { backgroundColor: '#F6FBF6', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16 },
+  searchRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
+  searchBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 20, paddingHorizontal: 14, shadowColor: '#1F2D1F', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
+  searchInput: { flex: 1, height: 48, fontSize: 14, color: colors.text },
+  searchBtn: { backgroundColor: colors.primary, borderRadius: 20, paddingHorizontal: 18, height: 48, alignItems: 'center', justifyContent: 'center', shadowColor: colors.primary, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 },
+  searchBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 13, letterSpacing: 0.3 },
+  chip: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7, borderWidth: 1, borderColor: colors.border },
+  chipText: { fontSize: 13, color: colors.primary, fontFamily: fontFamily.semibold },
+  section: { paddingHorizontal: 20, paddingTop: 24 },
+  sectionTitle: { fontSize: 16, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 14, letterSpacing: 0.2 },
+  specialtyGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  specialtyCard: { width: '23%', aspectRatio: 0.9, backgroundColor: colors.bg, borderRadius: 18, alignItems: 'center', justifyContent: 'center', padding: 8, borderWidth: 1, borderColor: colors.border, shadowColor: '#1F2D1F', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
+  specialtyLabel: { fontSize: 9, color: colors.textSecondary, fontFamily: fontFamily.semibold, textAlign: 'center', marginTop: 4, flexWrap: 'wrap' },
+  profileCard: { borderRadius: 20, padding: 18, marginBottom: 12, shadowColor: '#1F2D1F', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  profileTitle: { fontSize: 15, fontFamily: fontFamily.bold },
+  profileSubtitle: { fontSize: 13, fontFamily: fontFamily.semibold, opacity: 0.85 },
+  profileDesc: { fontSize: 13, color: colors.textSecondary, lineHeight: 20, marginTop: 2 },
+  ctaBox: { margin: 20, backgroundColor: colors.primaryDark, borderRadius: 24, padding: 28, alignItems: 'center', shadowColor: colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.25, shadowRadius: 16, elevation: 8 },
+  ctaTitle: { fontSize: 19, fontFamily: fontFamily.bold, color: '#fff', marginBottom: 8, letterSpacing: 0.2 },
+  ctaSub: { fontSize: 13, color: 'rgba(255,255,255,0.8)', textAlign: 'center', marginBottom: 20, lineHeight: 20 },
+  ctaBtn: { backgroundColor: '#fff', borderRadius: 999, paddingHorizontal: 28, paddingVertical: 13 },
+  ctaBtnText: { color: colors.primaryDark, fontFamily: fontFamily.bold, fontSize: 14, letterSpacing: 0.3 },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -235,7 +300,7 @@ function StarRating({ value }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
       <Feather name='star' size={12} color='#f59e0b' />
-      <Text style={{ fontSize: 12, color: colors.textSecondary, fontWeight: '600' }}>{value}</Text>
+      <Text style={{ fontSize: 12, color: colors.textSecondary, fontFamily: fontFamily.semibold }}>{value}</Text>
     </View>
   )
 }
@@ -359,16 +424,16 @@ const fs = StyleSheet.create({
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '80%' },
   handle: { width: 40, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: 'center', marginBottom: 16 },
   sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  sheetTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
-  clearBtn: { fontSize: 14, color: colors.danger, fontWeight: '600' },
-  filterLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, marginBottom: 8, marginTop: 16 },
+  sheetTitle: { fontSize: 18, fontFamily: fontFamily.bold, color: colors.text },
+  clearBtn: { fontSize: 14, color: colors.danger, fontFamily: fontFamily.semibold },
+  filterLabel: { fontSize: 13, fontFamily: fontFamily.semibold, color: colors.textSecondary, marginBottom: 8, marginTop: 16 },
   optionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   optionChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.bg },
   optionChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  optionText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
-  optionTextActive: { color: colors.primary, fontWeight: '600' },
+  optionText: { fontSize: 13, color: colors.textSecondary, fontFamily: fontFamily.medium },
+  optionTextActive: { color: colors.primary, fontFamily: fontFamily.semibold },
   applyBtn: { marginTop: 24, backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
-  applyBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  applyBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },
 })
 
 function SearchScreen({ navigation, route }) {
@@ -482,44 +547,43 @@ function SearchScreen({ navigation, route }) {
 }
 
 const ss = StyleSheet.create({
-  searchHeader: { backgroundColor: colors.bg, paddingHorizontal: 16, paddingBottom: 12, flexDirection: 'row', gap: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
-  searchInputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgLight, borderRadius: 12, paddingHorizontal: 12, height: 44 },
-  searchInput: { flex: 1, fontSize: 15, color: colors.text },
-  filterBtn: { width: 44, height: 44, borderRadius: 12, backgroundColor: colors.bgLight, alignItems: 'center', justifyContent: 'center' },
-  filterBtnActive: { backgroundColor: colors.primaryLight },
-  filterBadge: { position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  filterBadgeText: { fontSize: 10, color: '#fff', fontWeight: '700' },
-  resultsMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10 },
-  resultsCount: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
-  clearLink: { fontSize: 13, color: colors.primary, fontWeight: '600' },
-  card: { backgroundColor: colors.bg, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardTop: { flexDirection: 'row', gap: 12, marginBottom: 10 },
-  avatarCircle: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 20, fontWeight: '700', color: colors.primary },
-  cardName: { fontSize: 15, fontWeight: '700', color: colors.text },
+  searchHeader: { backgroundColor: colors.bg, paddingHorizontal: 16, paddingBottom: 14, flexDirection: 'row', gap: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
+  searchInputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.bgLight, borderRadius: 16, paddingHorizontal: 14, height: 48, borderWidth: 1, borderColor: colors.border },
+  searchInput: { flex: 1, fontSize: 14, color: colors.text },
+  filterBtn: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.bgLight, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
+  filterBtnActive: { backgroundColor: colors.primaryLight, borderColor: colors.primaryBorder },
+  filterBadge: { position: 'absolute', top: -4, right: -4, width: 17, height: 17, borderRadius: 9, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  filterBadgeText: { fontSize: 10, color: '#fff', fontFamily: fontFamily.bold },
+  resultsMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  resultsCount: { fontSize: 13, color: colors.textSecondary, fontFamily: fontFamily.semibold },
+  clearLink: { fontSize: 13, color: colors.primary, fontFamily: fontFamily.bold },
+  card: { backgroundColor: colors.bg, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: colors.border, shadowColor: '#1F2D1F', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
+  cardTop: { flexDirection: 'row', gap: 14, marginBottom: 12 },
+  avatarCircle: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 22, fontFamily: fontFamily.bold, color: colors.primary },
+  cardName: { fontSize: 15, fontFamily: fontFamily.bold, color: colors.text },
   cardProfession: { fontSize: 13, color: colors.textSecondary, marginTop: 1 },
-  cardCrp: { fontSize: 11, color: colors.textLight, marginTop: 1 },
+  cardCrp: { fontSize: 11, color: colors.textLight, marginTop: 2 },
   priceBox: { alignItems: 'flex-end' },
-  priceValue: { fontSize: 16, fontWeight: '800', color: colors.primary },
+  priceValue: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.primary },
   priceSub: { fontSize: 11, color: colors.textLight },
-  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
-  tagSpecialty: { backgroundColor: '#e8f5e9', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagSpecialtyText: { fontSize: 11, color: '#2e7d32', fontWeight: '600' },
-  tagApproach: { backgroundColor: '#e3f2fd', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagApproachText: { fontSize: 11, color: '#1565c0', fontWeight: '600' },
-  tagOnline: { backgroundColor: '#f3e5f5', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagOnlineText: { fontSize: 11, color: '#6a1b9a', fontWeight: '600' },
-  tagPresential: { backgroundColor: '#fff3e0', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagPresentialText: { fontSize: 11, color: '#e65100', fontWeight: '600' },
-  cardBottom: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
+  tagSpecialty: { backgroundColor: colors.primaryLight, borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
+  tagSpecialtyText: { fontSize: 11, color: colors.primaryDark, fontFamily: fontFamily.bold },
+  tagApproach: { backgroundColor: '#EEF2FF', borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
+  tagApproachText: { fontSize: 11, color: '#3730A3', fontFamily: fontFamily.bold },
+  tagOnline: { backgroundColor: '#F5F0FF', borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
+  tagOnlineText: { fontSize: 11, color: '#6D28D9', fontFamily: fontFamily.bold },
+  tagPresential: { backgroundColor: '#FFF7ED', borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
+  tagPresentialText: { fontSize: 11, color: '#C2410C', fontFamily: fontFamily.bold },
+  cardBottom: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border },
   reviewsText: { fontSize: 12, color: colors.textLight },
-  cardCta: { fontSize: 13, color: colors.primary, fontWeight: '600' },
+  cardCta: { fontSize: 13, color: colors.primary, fontFamily: fontFamily.bold },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 6 },
+  emptyTitle: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 6, marginTop: 12 },
   emptySub: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 },
-  emptyBtn: { backgroundColor: colors.primaryLight, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 10 },
-  emptyBtnText: { color: colors.primary, fontWeight: '600', fontSize: 14 },
+  emptyBtn: { backgroundColor: colors.primaryLight, borderRadius: 16, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtnText: { color: colors.primary, fontFamily: fontFamily.bold, fontSize: 14 },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -555,8 +619,7 @@ function LoginScreen({ navigation }) {
       <View style={[ls.container, { paddingTop: insets.top + 32 }]}>
         {/* Logo */}
         <View style={ls.logoWrap}>
-          <View style={ls.logoCircle}><Text style={ls.logoText}>A+</Text></View>
-          <Text style={ls.logoLabel}>Acolhe+</Text>
+          <Image source={require('../../assets/logo.png')} style={ls.logoImg} resizeMode="contain" />
         </View>
 
         {forgotMode ? (
@@ -641,26 +704,27 @@ function LoginScreen({ navigation }) {
 
 const ls = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 28, paddingBottom: 32 },
-  logoWrap: { alignItems: 'center', marginBottom: 32 },
+  logoWrap: { alignItems: 'center', marginBottom: 28},
+  logoImg: { width: 190, height: 90,  opacity: 0.96},
   logoCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  logoText: { fontSize: 22, fontWeight: '800', color: '#fff' },
-  logoLabel: { fontSize: 20, fontWeight: '800', color: colors.primaryDark },
-  title: { fontSize: 24, fontWeight: '800', color: colors.text, marginBottom: 6 },
+  logoText: { fontSize: 22, fontFamily: fontFamily.bold, color: '#fff' },
+  logoLabel: { fontSize: 20, fontFamily: fontFamily.bold, color: colors.primaryDark },
+  title: { fontSize: 24, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 6 },
   subtitle: { fontSize: 14, color: colors.textSecondary, marginBottom: 28 },
   fieldWrap: { marginBottom: 16 },
-  fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
+  fieldLabel: { fontSize: 13, fontFamily: fontFamily.semibold, color: colors.text, marginBottom: 6 },
   input: { height: 48, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, fontSize: 15, color: colors.text, backgroundColor: colors.bgLight },
   inputError: { borderColor: colors.danger },
   fieldError: { fontSize: 12, color: colors.danger, marginTop: 4 },
-  forgotLink: { fontSize: 13, color: colors.primary, fontWeight: '600' },
+  forgotLink: { fontSize: 13, color: colors.primary, fontFamily: fontFamily.semibold },
   btn: { height: 50, backgroundColor: colors.primary, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  btnText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
   footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
   footerText: { fontSize: 14, color: colors.textSecondary },
-  footerLink: { fontSize: 14, color: colors.primary, fontWeight: '600' },
-  linkText: { fontSize: 14, color: colors.primary, fontWeight: '600', textAlign: 'center', marginTop: 16 },
+  footerLink: { fontSize: 14, color: colors.primary, fontFamily: fontFamily.semibold },
+  linkText: { fontSize: 14, color: colors.primary, fontFamily: fontFamily.semibold, textAlign: 'center', marginTop: 16 },
   successBox: { backgroundColor: colors.primaryLight, borderRadius: 12, padding: 14, marginBottom: 20 },
-  successText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
+  successText: { fontSize: 14, color: colors.primary, fontFamily: fontFamily.semibold },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -713,7 +777,7 @@ function RegisterScreen({ navigation }) {
               <Text style={rs.backBtnText}>←</Text>
             </TouchableOpacity>
           )}
-          <View style={rs.logoCircle}><Text style={rs.logoText}>A+</Text></View>
+          <Image source={require('../../assets/logo.png')} style={{ width: 80, height: 50 }} resizeMode="contain" />
         </View>
 
         {/* Steps indicator */}
@@ -801,31 +865,31 @@ const rs = StyleSheet.create({
   backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.bgLight, alignItems: 'center', justifyContent: 'center' },
   backBtnText: { fontSize: 18, color: colors.primary },
   logoCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  logoText: { fontSize: 14, fontWeight: '800', color: '#fff' },
+  logoText: { fontSize: 14, fontFamily: fontFamily.bold, color: '#fff' },
   stepsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 28 },
   stepDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.border },
   stepDotActive: { backgroundColor: colors.primary },
   stepLine: { flex: 1, height: 2, backgroundColor: colors.border, marginHorizontal: 6 },
-  title: { fontSize: 24, fontWeight: '800', color: colors.text, marginBottom: 6 },
+  title: { fontSize: 24, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 6 },
   subtitle: { fontSize: 14, color: colors.textSecondary, marginBottom: 24 },
   fieldWrap: { marginBottom: 14 },
-  fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
+  fieldLabel: { fontSize: 13, fontFamily: fontFamily.semibold, color: colors.text, marginBottom: 6 },
   input: { height: 48, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, fontSize: 15, color: colors.text, backgroundColor: colors.bgLight },
   inputError: { borderColor: colors.danger },
   fieldError: { fontSize: 12, color: colors.danger, marginTop: 4 },
   btn: { height: 50, backgroundColor: colors.primary, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  btnText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
   rolesWrap: { gap: 12, marginBottom: 24 },
   roleCard: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 16, padding: 18, alignItems: 'center', backgroundColor: colors.bgLight },
   roleCardActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
   roleIcon: { fontSize: 36, marginBottom: 8 },
-  roleLabel: { fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 4 },
+  roleLabel: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 4 },
   roleLabelActive: { color: colors.primary },
   roleDesc: { fontSize: 13, color: colors.textSecondary, textAlign: 'center' },
   roleCheck: { position: 'absolute', top: 12, right: 12, width: 20, height: 20, borderRadius: 10, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
   footerText: { fontSize: 14, color: colors.textSecondary },
-  footerLink: { fontSize: 14, color: colors.primary, fontWeight: '600' },
+  footerLink: { fontSize: 14, color: colors.primary, fontFamily: fontFamily.semibold },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -847,7 +911,7 @@ function PsychologistScreen({ route, navigation }) {
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text style={{ fontSize: 16, color: colors.textSecondary }}>Profissional não encontrado.</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 16 }}>
-          <Text style={{ color: colors.primary, fontWeight: '600' }}>← Voltar</Text>
+          <Text style={{ color: colors.primary, fontFamily: fontFamily.semibold }}>← Voltar</Text>
         </TouchableOpacity>
       </View>
     )
@@ -977,7 +1041,7 @@ function PsychologistScreen({ route, navigation }) {
             <View style={{ alignItems: 'center', padding: 24 }}>
               <View style={ps.successCircle}><Feather name='check' size={32} color={colors.primary} /></View>
               <Text style={ps.successTitle}>Sessão agendada!</Text>
-              <Text style={ps.successSub}>Sua sessão com <Text style={{ fontWeight: '700' }}>{psy.name}</Text> foi marcada para <Text style={{ fontWeight: '700' }}>{selectedDay}</Text> às <Text style={{ fontWeight: '700' }}>{selectedTime}</Text>.</Text>
+              <Text style={ps.successSub}>Sua sessão com <Text style={{ fontFamily: fontFamily.bold }}>{psy.name}</Text> foi marcada para <Text style={{ fontFamily: fontFamily.bold }}>{selectedDay}</Text> às <Text style={{ fontFamily: fontFamily.bold }}>{selectedTime}</Text>.</Text>
               <TouchableOpacity style={ps.successBtn} onPress={() => { setBookingOpen(false); setBookingDone(false); navigation.navigate('FichaTab') }}>
                 <Text style={ps.successBtnText}>Ver minha ficha</Text>
               </TouchableOpacity>
@@ -1034,63 +1098,63 @@ function PsychologistScreen({ route, navigation }) {
 const ps = StyleSheet.create({
   hero: { backgroundColor: colors.primaryLight, alignItems: 'center', padding: 28, paddingTop: 36 },
   avatarLarge: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  avatarText: { fontSize: 32, fontWeight: '800', color: '#fff' },
-  name: { fontSize: 22, fontWeight: '800', color: colors.text, marginBottom: 4 },
+  avatarText: { fontSize: 32, fontFamily: fontFamily.bold, color: '#fff' },
+  name: { fontSize: 22, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 4 },
   profession: { fontSize: 14, color: colors.textSecondary, marginBottom: 12 },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'center', marginBottom: 10 },
   tagGreen: { backgroundColor: '#e8f5e9', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagGreenText: { fontSize: 11, color: '#2e7d32', fontWeight: '600' },
+  tagGreenText: { fontSize: 11, color: '#2e7d32', fontFamily: fontFamily.semibold },
   tagBlue: { backgroundColor: '#e3f2fd', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagBlueText: { fontSize: 11, color: '#1565c0', fontWeight: '600' },
+  tagBlueText: { fontSize: 11, color: '#1565c0', fontFamily: fontFamily.semibold },
   tagPurple: { backgroundColor: '#f3e5f5', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagPurpleText: { fontSize: 11, color: '#6a1b9a', fontWeight: '600' },
+  tagPurpleText: { fontSize: 11, color: '#6a1b9a', fontFamily: fontFamily.semibold },
   tagOrange: { backgroundColor: '#fff3e0', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  tagOrangeText: { fontSize: 11, color: '#e65100', fontWeight: '600' },
+  tagOrangeText: { fontSize: 11, color: '#e65100', fontFamily: fontFamily.semibold },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  ratingText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  ratingText: { fontSize: 14, fontFamily: fontFamily.bold, color: colors.text },
   reviewsText: { fontSize: 13, color: colors.textSecondary },
   section: { padding: 20, borderBottomWidth: 1, borderBottomColor: colors.border },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 10 },
+  sectionTitle: { fontSize: 16, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 10 },
   sectionText: { fontSize: 14, color: colors.textSecondary, lineHeight: 22 },
   listItem: { flexDirection: 'row', gap: 8, marginBottom: 6 },
-  bullet: { color: colors.primary, fontWeight: '700', fontSize: 16 },
+  bullet: { color: colors.primary, fontFamily: fontFamily.bold, fontSize: 16 },
   listText: { fontSize: 14, color: colors.textSecondary, flex: 1 },
   areasWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   areaChip: { backgroundColor: colors.bgSubtle, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
-  areaChipText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
+  areaChipText: { fontSize: 13, color: colors.textSecondary, fontFamily: fontFamily.medium },
   scheduleRow: { flexDirection: 'row', gap: 8, alignItems: 'center', marginBottom: 6 },
   scheduleText: { fontSize: 14, color: colors.textSecondary },
   testimonialCard: { backgroundColor: colors.bgLight, borderRadius: 12, padding: 14, marginBottom: 10 },
   testimonialText: { fontSize: 14, color: colors.text, lineHeight: 20, marginTop: 4, marginBottom: 6 },
-  testimonialAuthor: { fontSize: 12, color: colors.textLight, fontWeight: '500' },
+  testimonialAuthor: { fontSize: 12, color: colors.textLight, fontFamily: fontFamily.medium },
   bookingBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 10 },
-  priceValue: { fontSize: 20, fontWeight: '800', color: colors.primary },
-  priceSub: { fontSize: 13, fontWeight: '400', color: colors.textSecondary },
+  priceValue: { fontSize: 20, fontFamily: fontFamily.bold, color: colors.primary },
+  priceSub: { fontSize: 13, fontFamily: fontFamily.regular, color: colors.textSecondary },
   audienceText: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   bookingBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 24, paddingVertical: 13 },
-  bookingBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  bookingBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },
   modalSheet: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '75%' },
   modalHandle: { width: 40, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: colors.text, marginBottom: 4 },
+  modalTitle: { fontSize: 18, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 4 },
   modalSub: { fontSize: 13, color: colors.textSecondary, marginBottom: 20 },
-  stepLabel: { fontSize: 14, fontWeight: '600', color: colors.text, marginBottom: 10 },
+  stepLabel: { fontSize: 14, fontFamily: fontFamily.semibold, color: colors.text, marginBottom: 10 },
   dateChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.bg },
   dateChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  dateChipText: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
-  dateChipTextActive: { color: colors.primary, fontWeight: '700' },
+  dateChipText: { fontSize: 13, color: colors.textSecondary, fontFamily: fontFamily.medium },
+  dateChipTextActive: { color: colors.primary, fontFamily: fontFamily.bold },
   timeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   timeChip: { width: '22%', paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.bg, alignItems: 'center' },
   timeChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  timeChipText: { fontSize: 14, color: colors.textSecondary, fontWeight: '500' },
-  timeChipTextActive: { color: colors.primary, fontWeight: '700' },
+  timeChipText: { fontSize: 14, color: colors.textSecondary, fontFamily: fontFamily.medium },
+  timeChipTextActive: { color: colors.primary, fontFamily: fontFamily.bold },
   confirmBtn: { marginTop: 24, backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
   confirmBtnDisabled: { backgroundColor: colors.border },
-  confirmBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  confirmBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },
   successCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  successTitle: { fontSize: 22, fontWeight: '800', color: colors.text, marginBottom: 8 },
+  successTitle: { fontSize: 22, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 8 },
   successSub: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 22, marginBottom: 24 },
   successBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 28, paddingVertical: 13 },
-  successBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  successBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1103,7 +1167,7 @@ const Tab = createBottomTabNavigator()
 const defaultScreenOptions = {
   headerStyle: { backgroundColor: colors.bg },
   headerTintColor: colors.primary,
-  headerTitleStyle: { fontWeight: '600', color: colors.text },
+  headerTitleStyle: { fontFamily: fontFamily.semibold, color: colors.text },
   headerShadowVisible: false,
   headerBackTitleVisible: false,
 }
@@ -1192,7 +1256,7 @@ function TeleconsultaModal({ visible, session, onClose, isProfessional }) {
             {/* Vídeo remoto (simulado) */}
             <View style={tc.remoteVideo}>
               <View style={tc.remoteAvatar}>
-                <Text style={{ fontSize: 48, fontWeight: '800', color: '#fff' }}>
+                <Text style={{ fontSize: 48, fontFamily: fontFamily.bold, color: '#fff' }}>
                   {session.professional?.charAt(0) || '?'}
                 </Text>
               </View>
@@ -1229,16 +1293,16 @@ function TeleconsultaModal({ visible, session, onClose, isProfessional }) {
 
 const tc = StyleSheet.create({
   waitCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#1a1a2e', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  waitTitle: { fontSize: 26, fontWeight: '800', color: '#fff', marginBottom: 4 },
+  waitTitle: { fontSize: 26, fontFamily: fontFamily.bold, color: '#fff', marginBottom: 4 },
   waitWith: { fontSize: 16, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
   waitDate: { fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 28 },
   infoBox: { backgroundColor: '#1a1a2e', borderRadius: 16, padding: 16, gap: 8, marginBottom: 32, width: '100%' },
   infoRow: { fontSize: 14, color: 'rgba(255,255,255,0.7)' },
   enterBtn: { backgroundColor: colors.primary, borderRadius: 16, paddingVertical: 16, paddingHorizontal: 40 },
-  enterBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  enterBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 16 },
   remoteVideo: { flex: 1, backgroundColor: '#111827', alignItems: 'center', justifyContent: 'center' },
   remoteAvatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: colors.primaryDark, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  remoteName: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 6 },
+  remoteName: { fontSize: 18, fontFamily: fontFamily.bold, color: '#fff', marginBottom: 6 },
   callTimer: { fontSize: 14, color: 'rgba(255,255,255,0.5)' },
   localVideo: { position: 'absolute', top: 16, right: 16, width: 90, height: 120, borderRadius: 12, backgroundColor: '#1f2937', overflow: 'hidden', borderWidth: 2, borderColor: '#fff' },
   controls: { position: 'absolute', bottom: 48, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 20 },
@@ -1388,41 +1452,41 @@ function FichaScreen({ navigation }) {
 const fi = StyleSheet.create({
   header: { backgroundColor: colors.primaryLight, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 20, paddingBottom: 24 },
   avatarCircle: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 22, fontWeight: '800', color: '#fff' },
-  userName: { fontSize: 17, fontWeight: '700', color: colors.text },
+  avatarText: { fontSize: 22, fontFamily: fontFamily.bold, color: '#fff' },
+  userName: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text },
   userEmail: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
   roleBadge: { marginTop: 6, backgroundColor: colors.bg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-start' },
-  roleText: { fontSize: 12, color: colors.primary, fontWeight: '600' },
+  roleText: { fontSize: 12, color: colors.primary, fontFamily: fontFamily.semibold },
   editBtn: { borderWidth: 1.5, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
-  editBtnText: { color: colors.primary, fontSize: 13, fontWeight: '600' },
+  editBtnText: { color: colors.primary, fontSize: 13, fontFamily: fontFamily.semibold },
   statsRow: { flexDirection: 'row', backgroundColor: colors.bg, borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 16 },
   statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.primary },
+  statValue: { fontSize: 22, fontFamily: fontFamily.bold, color: colors.primary },
   statLabel: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: colors.border },
   section: { padding: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 12 },
   sessionCard: { backgroundColor: colors.bg, borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: colors.border },
   sessionTop: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 },
-  sessionProf: { fontSize: 15, fontWeight: '700', color: colors.text },
+  sessionProf: { fontSize: 15, fontFamily: fontFamily.bold, color: colors.text },
   sessionSpec: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
   statusBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  statusText: { fontSize: 12, fontWeight: '600' },
+  statusText: { fontSize: 12, fontFamily: fontFamily.semibold },
   sessionMeta: { flexDirection: 'row', gap: 12, marginBottom: 4 },
   sessionMetaText: { fontSize: 13, color: colors.textSecondary },
   sessionNotes: { fontSize: 13, color: colors.textLight, fontStyle: 'italic', marginTop: 4 },
   emptyState: { alignItems: 'center', paddingVertical: 32 },
   emptyIcon: { fontSize: 48, marginBottom: 12 },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: colors.text, marginBottom: 6 },
+  emptyTitle: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 6 },
   emptySub: { fontSize: 14, color: colors.textSecondary, marginBottom: 20 },
   emptyBtn: { backgroundColor: colors.primary, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 10 },
-  emptyBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  emptyBtnText: { color: '#fff', fontFamily: fontFamily.semibold, fontSize: 14 },
   emptyHint: { fontSize: 14, color: colors.textLight, textAlign: 'center', paddingVertical: 16 },
   quickBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
-  quickBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  quickBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },
   teleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 10, backgroundColor: '#0f172a', borderRadius: 10, paddingVertical: 10 },
   teleBtnIcon: { fontSize: 16 },
-  teleBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  teleBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 14 },
 })
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1532,30 +1596,30 @@ function ProfissionalDashboard({ navigation }) {
 const pd = StyleSheet.create({
   header: { backgroundColor: colors.primaryLight, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 20, paddingBottom: 24 },
   avatarCircle: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 20, fontWeight: '800', color: '#fff' },
-  greeting: { fontSize: 17, fontWeight: '700', color: colors.text },
+  avatarText: { fontSize: 20, fontFamily: fontFamily.bold, color: '#fff' },
+  greeting: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text },
   role: { fontSize: 13, color: colors.textSecondary, marginTop: 2 },
   editBtn: { borderWidth: 1.5, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
-  editBtnText: { color: colors.primary, fontSize: 13, fontWeight: '600' },
+  editBtnText: { color: colors.primary, fontSize: 13, fontFamily: fontFamily.semibold },
   statsRow: { flexDirection: 'row', backgroundColor: colors.bg, borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 16 },
   statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.primary },
+  statValue: { fontSize: 22, fontFamily: fontFamily.bold, color: colors.primary },
   statLabel: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: colors.border },
   section: { padding: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 12 },
   card: { backgroundColor: colors.bg, borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: colors.border },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   patientAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  patientAvatarText: { fontSize: 16, fontWeight: '700', color: colors.primary },
-  patientName: { fontSize: 15, fontWeight: '700', color: colors.text },
+  patientAvatarText: { fontSize: 16, fontFamily: fontFamily.bold, color: colors.primary },
+  patientName: { fontSize: 15, fontFamily: fontFamily.bold, color: colors.text },
   patientSpec: { fontSize: 13, color: colors.textSecondary },
   statusBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  statusText: { fontSize: 12, fontWeight: '600' },
+  statusText: { fontSize: 12, fontFamily: fontFamily.semibold },
   cardMeta: { flexDirection: 'row', gap: 16, marginBottom: 4 },
   metaText: { fontSize: 13, color: colors.textSecondary },
   teleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 10, backgroundColor: '#0f172a', borderRadius: 10, paddingVertical: 10 },
-  teleBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  teleBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 14 },
   emptyHint: { fontSize: 14, color: colors.textLight, textAlign: 'center', paddingVertical: 16 },
 })
 
@@ -1676,29 +1740,29 @@ function ProfileScreen({ navigation }) {
 const pf = StyleSheet.create({
   header: { backgroundColor: colors.primaryLight, alignItems: 'center', padding: 24, paddingBottom: 28 },
   avatarCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  avatarText: { fontSize: 28, fontWeight: '800', color: '#fff' },
-  userName: { fontSize: 20, fontWeight: '800', color: colors.text, marginBottom: 4 },
+  avatarText: { fontSize: 28, fontFamily: fontFamily.bold, color: '#fff' },
+  userName: { fontSize: 20, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 4 },
   userEmail: { fontSize: 14, color: colors.textSecondary, marginBottom: 14 },
   editToggle: { borderWidth: 1.5, borderColor: colors.primary, borderRadius: 20, paddingHorizontal: 18, paddingVertical: 7 },
-  editToggleText: { color: colors.primary, fontSize: 14, fontWeight: '600' },
+  editToggleText: { color: colors.primary, fontSize: 14, fontFamily: fontFamily.semibold },
   savedBanner: { backgroundColor: colors.primaryLight, padding: 12, alignItems: 'center' },
-  savedText: { color: colors.primary, fontWeight: '600', fontSize: 14 },
+  savedText: { color: colors.primary, fontFamily: fontFamily.semibold, fontSize: 14 },
   section: { padding: 20, borderBottomWidth: 1, borderBottomColor: colors.border },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 14 },
+  sectionTitle: { fontSize: 15, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 14 },
   fieldWrap: { marginBottom: 14 },
-  fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 6 },
+  fieldLabel: { fontSize: 13, fontFamily: fontFamily.semibold, color: colors.text, marginBottom: 6 },
   input: { height: 48, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, fontSize: 15, color: colors.text, backgroundColor: colors.bgLight },
   saveBtn: { height: 50, backgroundColor: colors.primary, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
-  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  saveBtnText: { color: '#fff', fontSize: 15, fontFamily: fontFamily.bold },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
-  infoLabel: { fontSize: 14, color: colors.textSecondary, fontWeight: '500' },
-  infoValue: { fontSize: 14, color: colors.text, fontWeight: '600', maxWidth: '60%', textAlign: 'right' },
+  infoLabel: { fontSize: 14, color: colors.textSecondary, fontFamily: fontFamily.medium },
+  infoValue: { fontSize: 14, color: colors.text, fontFamily: fontFamily.semibold, maxWidth: '60%', textAlign: 'right' },
   menuRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12 },
   menuIcon: { fontSize: 20, width: 28 },
-  menuLabel: { flex: 1, fontSize: 15, color: colors.text, fontWeight: '500' },
+  menuLabel: { flex: 1, fontSize: 15, color: colors.text, fontFamily: fontFamily.medium },
   menuChevron: { fontSize: 20, color: colors.textLight },
   logoutBtn: { borderWidth: 1.5, borderColor: colors.danger, borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
-  logoutBtnText: { color: colors.danger, fontWeight: '700', fontSize: 15 },
+  logoutBtnText: { color: colors.danger, fontFamily: fontFamily.bold, fontSize: 15 },
 })
 
 // ─── Stacks ───────────────────────────────────────────────────────────────────
