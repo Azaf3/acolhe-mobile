@@ -14,7 +14,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAuth } from '../context/AuthContext'
 import { colors, spacing, radius, fontSize, fontWeight, shadow, fontFamily } from '../theme'
-import { PSYCHOLOGISTS, AUDIENCE_OPTIONS, PROFESSION_OPTIONS } from '../data/psychologists'
+import { PSYCHOLOGISTS_SEED, AUDIENCE_OPTIONS, PROFESSION_OPTIONS, buildProfessionalFromUser } from '../data/psychologists'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // ─── BottomTabBar ─────────────────────────────────────────────────────────────
 
@@ -450,10 +451,31 @@ function SearchScreen({ navigation, route }) {
     approach: '',
   })
 
+  const [registeredPros, setRegisteredPros] = React.useState([])
+
+  React.useEffect(() => {
+    async function loadPros() {
+      try {
+        const raw = await AsyncStorage.getItem('@acolhe:accounts')
+        const accounts = raw ? JSON.parse(raw) : []
+        const pros = accounts
+          .filter(a => a.role === 'profissional')
+          .map(buildProfessionalFromUser)
+        setRegisteredPros(pros)
+      } catch (e) {}
+    }
+    loadPros()
+  }, [])
+
+  const allProfessionals = React.useMemo(
+    () => [...PSYCHOLOGISTS_SEED, ...registeredPros],
+    [registeredPros]
+  )
+
   const activeCount = Object.values(filters).filter(Boolean).length
 
   const results = useMemo(() => {
-    return PSYCHOLOGISTS.filter(p => {
+    return allProfessionals.filter(p => {
       const q = query.toLowerCase()
       const matchQuery = !query ||
         p.name.toLowerCase().includes(q) ||
@@ -466,7 +488,7 @@ function SearchScreen({ navigation, route }) {
       const matchModality = !filters.modality || (filters.modality === 'online' ? p.online : p.presential)
       return matchQuery && matchProfession && matchSpecialty && matchAudience && matchModality
     })
-  }, [query, filters])
+  }, [query, filters, allProfessionals])
 
   function changeFilter(key, value) {
     setFilters(f => ({ ...f, [key]: value }))
@@ -579,6 +601,8 @@ const ss = StyleSheet.create({
   cardBottom: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border },
   reviewsText: { fontSize: 12, color: colors.textLight },
   cardCta: { fontSize: 13, color: colors.primary, fontFamily: fontFamily.bold },
+  newBadge: { backgroundColor: '#FFF3CD', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
+  newBadgeText: { fontSize: 10, color: '#856404', fontFamily: fontFamily.bold },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emptyTitle: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.text, marginBottom: 6, marginTop: 12 },
   emptySub: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 },
@@ -899,7 +923,24 @@ const rs = StyleSheet.create({
 function PsychologistScreen({ route, navigation }) {
   const { id } = route.params
   const { user, isAuthenticated, updateUser } = useAuth()
-  const psy = PSYCHOLOGISTS.find(p => p.id === Number(id))
+  const [psy, setPsy] = React.useState(null)
+
+  React.useEffect(() => {
+    async function loadPsy() {
+      try {
+        const raw = await AsyncStorage.getItem('@acolhe:accounts')
+        const accounts = raw ? JSON.parse(raw) : []
+        const regPros = accounts
+          .filter(a => a.role === 'profissional')
+          .map(buildProfessionalFromUser)
+        const all = [...PSYCHOLOGISTS_SEED, ...regPros]
+        setPsy(all.find(p => String(p.id) === String(id)) || null)
+      } catch (e) {
+        setPsy(PSYCHOLOGISTS_SEED.find(p => String(p.id) === String(id)) || null)
+      }
+    }
+    loadPsy()
+  }, [id])
 
   const [bookingOpen, setBookingOpen] = useState(false)
   const [selectedDay, setSelectedDay] = useState('')
@@ -939,7 +980,7 @@ function PsychologistScreen({ route, navigation }) {
     setBookingOpen(true)
   }
 
-  function confirmBooking() {
+  async function confirmBooking() {
     if (!selectedDay || !selectedTime) return
     const newSession = {
       id: Date.now(),
@@ -950,7 +991,34 @@ function PsychologistScreen({ route, navigation }) {
       status: 'Agendada',
       notes: `Sessão de ${psy.specialty.toLowerCase()} — ${psy.approach}`,
     }
+
+    // Salva na ficha do paciente
     updateUser({ sessions: [...(user?.sessions || []), newSession] })
+
+    // Salva na conta do profissional (se for cadastrado no app)
+    if (psy.isNew) {
+      try {
+        const raw = await AsyncStorage.getItem('@acolhe:accounts')
+        const accounts = raw ? JSON.parse(raw) : []
+        const idx = accounts.findIndex(a => a.email === psy.id.replace('user_', ''))
+        if (idx >= 0) {
+          const appointment = {
+            id: Date.now(),
+            patient: user.name,
+            specialty: psy.specialty,
+            date: selectedDay,
+            time: selectedTime,
+            status: 'Agendada',
+            modality: 'Online',
+          }
+          accounts[idx].appointments = [...(accounts[idx].appointments || []), appointment]
+          await AsyncStorage.setItem('@acolhe:accounts', JSON.stringify(accounts))
+        }
+      } catch (e) {
+        console.error('Erro ao salvar agendamento no profissional:', e)
+      }
+    }
+
     setBookingDone(true)
   }
 
@@ -1498,12 +1566,7 @@ function ProfissionalDashboard({ navigation }) {
   const insets = useSafeAreaInsets()
   const [teleconsultaSession, setTeleconsultaSession] = useState(null)
 
-  const sessions = [
-    { id: 101, patient: 'Ana Souza',      specialty: 'Ansiedade', date: '20/05/2026', time: '09:00', status: 'Agendada',  modality: 'Online' },
-    { id: 102, patient: 'Carlos Lima',    specialty: 'Depressão', date: '20/05/2026', time: '11:00', status: 'Agendada',  modality: 'Online' },
-    { id: 103, patient: 'Mariana Costa',  specialty: 'Trauma',    date: '18/05/2026', time: '14:00', status: 'Realizada', modality: 'Presencial' },
-    { id: 104, patient: 'Pedro Alves',    specialty: 'Família',   date: '15/05/2026', time: '16:00', status: 'Realizada', modality: 'Online' },
-  ]
+  const sessions = user?.appointments || []
 
   const upcoming = sessions.filter(s => s.status === 'Agendada')
   const past     = sessions.filter(s => s.status !== 'Agendada')
