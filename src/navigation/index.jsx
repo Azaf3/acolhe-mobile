@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAuth } from '../context/AuthContext'
 import { colors, spacing, radius, fontSize, fontWeight, shadow, fontFamily } from '../theme'
-import { PSYCHOLOGISTS_SEED, AUDIENCE_OPTIONS, PROFESSION_OPTIONS, buildProfessionalFromUser } from '../data/psychologists'
+import { PSYCHOLOGISTS_SEED, PROFESSION_OPTIONS, buildProfessionalFromUser } from '../data/psychologists'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // ─── BottomTabBar ─────────────────────────────────────────────────────────────
@@ -99,6 +99,8 @@ const CHIPS = [
   { label: 'Ansiedade' },
   { label: 'Depressão' },
   { label: 'Trauma' },
+  { label: 'Família' },
+  { label: 'Online' },
 ]
 
 const SPECIALTIES = [
@@ -112,11 +114,8 @@ const SPECIALTIES = [
   { label: 'Luto',             icon: 'feather' },
 ]
 
-const PROFILES = [
-  { id: 'baixa-renda', title: 'Atendimento social', subtitle: 'A partir de R$ 20/sessão', description: 'Consultas com valor reduzido para ampliar o acesso ao cuidado.', color: '#e8f5e9', accent: '#2e7d32' },
-  { id: 'renda-media', title: 'Plano essencial', subtitle: 'De R$ 35 a R$ 50/sessão', description: 'Sessões acessíveis com profissionais verificados.', color: '#e3f2fd', accent: '#1565c0' },
-  { id: 'empresa', title: 'Benefício corporativo', subtitle: 'Até R$ 50 por colaborador', description: 'Empresas parceiras subsidiam consultas de saúde mental.', color: '#fce4ec', accent: '#ad1457' },
-]
+
+
 
 // ─── Mesh Gradient Hero ──────────────────────────────────────────────────────
 
@@ -164,7 +163,7 @@ function HomeScreen({ navigation }) {
               <Image source={require('../../assets/logo.png')} style={hs.heroLogo} resizeMode="contain" />
               {isAuthenticated && <Text style={hs.greeting}>Olá, {user?.name?.split(' ')[0]}</Text>}
               <Text style={hs.heroTitle}>Encontre seu{'\n'}profissional</Text>
-              <Text style={hs.heroSub}>Psicólogos, psicanalistas e psiquiatras a partir de <Text style={{ fontFamily: fontFamily.bold, color: colors.primary }}>R$ 50/sessão</Text></Text>
+              <Text style={hs.heroSub}>Acesso gratuito a <Text style={{ fontFamily: fontFamily.bold, color: colors.primary }}>apoio psicológico comunitário</Text>, complementar à rede pública de saúde</Text>
             </View>
 
             {/* Coluna direita — ilustração */}
@@ -216,27 +215,11 @@ function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={hs.section}>
-          <Text style={hs.sectionTitle}>Modalidades de atendimento</Text>
-          {PROFILES.map(p => (
-            <TouchableOpacity key={p.id} style={[hs.profileCard, { backgroundColor: p.color }]} onPress={() => goToSearch({ perfil: p.id })} activeOpacity={0.8}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <Text style={{ fontSize: 28 }}>{p.icon}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[hs.profileTitle, { color: p.accent }]}>{p.title}</Text>
-                  <Text style={[hs.profileSubtitle, { color: p.accent }]}>{p.subtitle}</Text>
-                </View>
-                <Text style={{ fontSize: 28, color: p.accent, fontFamily: fontFamily.bold }}>›</Text>
-              </View>
-              <Text style={hs.profileDesc}>{p.description}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
 
         {!isAuthenticated && (
           <View style={hs.ctaBox}>
             <Text style={hs.ctaTitle}>Pronto para começar?</Text>
-            <Text style={hs.ctaSub}>Crie sua conta e agende sua primeira sessão.</Text>
+            <Text style={hs.ctaSub}>Crie sua conta gratuita e agende sua primeira sessão de apoio psicológico.</Text>
             <TouchableOpacity style={hs.ctaBtn} onPress={() => navigation.navigate('FichaTab')} activeOpacity={0.8}>
               <Text style={hs.ctaBtnText}>Criar conta gratuita</Text>
             </TouchableOpacity>
@@ -318,10 +301,6 @@ function PsyCard({ psy, onPress }) {
           <Text style={ss.cardProfession}>{psy.profession}</Text>
           <Text style={ss.cardCrp}>{psy.crp}</Text>
         </View>
-        <View style={ss.priceBox}>
-          <Text style={ss.priceValue}>R$ {psy.price}</Text>
-          <Text style={ss.priceSub}>/sessão</Text>
-        </View>
       </View>
 
       <View style={ss.tagsRow}>
@@ -397,19 +376,7 @@ function FilterSheet({ visible, onClose, filters, onChange, onClear }) {
             ))}
           </View>
 
-          {/* Público */}
-          <Text style={fs.filterLabel}>Público</Text>
-          <View style={fs.optionsRow}>
-            {AUDIENCE_OPTIONS.map(opt => (
-              <TouchableOpacity
-                key={opt}
-                style={[fs.optionChip, filters.audience === opt && fs.optionChipActive]}
-                onPress={() => onChange('audience', filters.audience === opt ? '' : opt)}
-              >
-                <Text style={[fs.optionText, filters.audience === opt && fs.optionTextActive]}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+
         </ScrollView>
 
         <TouchableOpacity style={fs.applyBtn} onPress={onClose}>
@@ -446,7 +413,6 @@ function SearchScreen({ navigation, route }) {
   const [filters, setFilters] = useState({
     profession: initialParams.profissao || '',
     specialty: initialParams.especialidade || '',
-    audience: initialParams.perfil || '',
     modality: '',
     approach: '',
   })
@@ -484,9 +450,8 @@ function SearchScreen({ navigation, route }) {
         p.approach.toLowerCase().includes(q)
       const matchProfession = !filters.profession || p.profession === filters.profession
       const matchSpecialty = !filters.specialty || p.specialty === filters.specialty
-      const matchAudience = !filters.audience || p.audience === filters.audience
       const matchModality = !filters.modality || (filters.modality === 'online' ? p.online : p.presential)
-      return matchQuery && matchProfession && matchSpecialty && matchAudience && matchModality
+      return matchQuery && matchProfession && matchSpecialty && matchModality
     })
   }, [query, filters, allProfessionals])
 
@@ -495,7 +460,7 @@ function SearchScreen({ navigation, route }) {
   }
 
   function clearFilters() {
-    setFilters({ profession: '', specialty: '', audience: '', modality: '', approach: '' })
+    setFilters({ profession: '', specialty: '', modality: '', approach: '' })
     setQuery('')
   }
 
@@ -586,9 +551,6 @@ const ss = StyleSheet.create({
   cardName: { fontSize: 15, fontFamily: fontFamily.bold, color: colors.text },
   cardProfession: { fontSize: 13, color: colors.textSecondary, marginTop: 1 },
   cardCrp: { fontSize: 11, color: colors.textLight, marginTop: 2 },
-  priceBox: { alignItems: 'flex-end' },
-  priceValue: { fontSize: 17, fontFamily: fontFamily.bold, color: colors.primary },
-  priceSub: { fontSize: 11, color: colors.textLight },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
   tagSpecialty: { backgroundColor: colors.primaryLight, borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
   tagSpecialtyText: { fontSize: 11, color: colors.primaryDark, fontFamily: fontFamily.bold },
@@ -1092,8 +1054,8 @@ function PsychologistScreen({ route, navigation }) {
       {/* Botão fixo de agendamento */}
       <View style={ps.bookingBar}>
         <View>
-          <Text style={ps.priceValue}>R$ {psy.price}<Text style={ps.priceSub}>/sessão</Text></Text>
-          <Text style={ps.audienceText}>{psy.careModel}</Text>
+          <Text style={ps.audienceText}>Atendimento gratuito</Text>
+          <Text style={ps.audienceText}>{psy.online && psy.presential ? 'Online e Presencial' : psy.online ? 'Online' : 'Presencial'}</Text>
         </View>
         <TouchableOpacity style={ps.bookingBtn} onPress={handleBooking} activeOpacity={0.85}>
           <Text style={ps.bookingBtnText}>Agendar sessão</Text>
@@ -1120,7 +1082,7 @@ function PsychologistScreen({ route, navigation }) {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={ps.modalTitle}>Agendar com {psy.name}</Text>
-              <Text style={ps.modalSub}>{psy.specialty} • {psy.approach} • R$ {psy.price}/sessão</Text>
+              <Text style={ps.modalSub}>{psy.specialty} • {psy.approach}</Text>
 
               <Text style={ps.stepLabel}>Escolha o dia</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
@@ -1196,8 +1158,6 @@ const ps = StyleSheet.create({
   testimonialText: { fontSize: 14, color: colors.text, lineHeight: 20, marginTop: 4, marginBottom: 6 },
   testimonialAuthor: { fontSize: 12, color: colors.textLight, fontFamily: fontFamily.medium },
   bookingBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 10 },
-  priceValue: { fontSize: 20, fontFamily: fontFamily.bold, color: colors.primary },
-  priceSub: { fontSize: 13, fontFamily: fontFamily.regular, color: colors.textSecondary },
   audienceText: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   bookingBtn: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 24, paddingVertical: 13 },
   bookingBtnText: { color: '#fff', fontFamily: fontFamily.bold, fontSize: 15 },

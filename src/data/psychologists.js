@@ -1,9 +1,3 @@
-export const AUDIENCE_OPTIONS = [
-  'Baixa renda',
-  'Renda média',
-  'Empresa parceira',
-]
-
 export const PROFESSION_OPTIONS = [
   'Psicólogo',
   'Psicanalista',
@@ -15,36 +9,6 @@ export const PROFESSION_OPTIONS = [
   'Conselheiro ou Orientador Emocional',
 ]
 
-export const CARE_MODELS = [
-  {
-    id: 'baixa-renda',
-    title: 'Atendimento social',
-    audience: 'Baixa renda',
-    priceLabel: 'De R$ 20 a R$ 30',
-    description: 'Consultas com valor reduzido para ampliar o acesso ao cuidado em saúde mental.',
-    cta: 'Ver atendimentos sociais',
-    queryValue: 'Baixa renda',
-  },
-  {
-    id: 'renda-media',
-    title: 'Plano essencial',
-    audience: 'Renda média',
-    priceLabel: 'De R$ 35 a R$ 50',
-    description: 'Sessões acessíveis com profissionais verificados e agenda flexível.',
-    cta: 'Explorar plano essencial',
-    queryValue: 'Renda média',
-  },
-  {
-    id: 'empresa-parceira',
-    title: 'Benefício corporativo',
-    audience: 'Empresa parceira',
-    priceLabel: 'Até R$ 50 por colaborador',
-    description: 'Empresas parceiras podem subsidiar consultas e ampliar o cuidado com saúde mental.',
-    cta: 'Conhecer modalidade corporativa',
-    queryValue: 'Empresa parceira',
-  },
-]
-
 // Profissionais fixos (seed)
 export const PSYCHOLOGISTS_SEED = [
   {
@@ -54,9 +18,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/112345',
     specialty: 'Ansiedade',
     approach: 'Cognitivo-Comportamental (TCC)',
-    price: 30,
-    audience: 'Baixa renda',
-    careModel: 'Atendimento social',
     rating: 4.9,
     reviews: 87,
     online: true,
@@ -79,9 +40,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/98432',
     specialty: 'Depressão',
     approach: 'Psicanálise',
-    price: 45,
-    audience: 'Renda média',
-    careModel: 'Plano essencial',
     rating: 4.8,
     reviews: 124,
     online: true,
@@ -103,9 +61,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/76543',
     specialty: 'Relacionamentos',
     approach: 'Humanista',
-    price: 40,
-    audience: 'Renda média',
-    careModel: 'Plano essencial',
     rating: 5,
     reviews: 56,
     online: true,
@@ -127,9 +82,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/54321',
     specialty: 'Trauma e TEPT',
     approach: 'EMDR',
-    price: 50,
-    audience: 'Empresa parceira',
-    careModel: 'Benefício corporativo',
     rating: 4.9,
     reviews: 43,
     online: true,
@@ -151,9 +103,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/33210',
     specialty: 'Família',
     approach: 'Gestalt',
-    price: 25,
-    audience: 'Baixa renda',
-    careModel: 'Atendimento social',
     rating: 4.7,
     reviews: 98,
     online: false,
@@ -165,7 +114,7 @@ export const PSYCHOLOGISTS_SEED = [
     areas: ['Família', 'Parentalidade', 'Casais', 'Conflitos'],
     schedule: ['Ter 8h-15h', 'Qui 8h-15h', 'Sex 8h-12h'],
     testimonials: [
-      { author: 'Paciente anônimo', text: 'A terapia familiar coube no nosso orçamento e fez muita diferença.' },
+      { author: 'Paciente anônimo', text: 'A terapia familiar fez muita diferença para nossa família.' },
     ],
   },
   {
@@ -175,9 +124,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRP 06/34521',
     specialty: 'Suporte cotidiano',
     approach: 'Acompanhamento Terapêutico',
-    price: 25,
-    audience: 'Baixa renda',
-    careModel: 'Atendimento social',
     rating: 4.8,
     reviews: 29,
     online: false,
@@ -199,9 +145,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'CRM 06/87654',
     specialty: 'Depressão',
     approach: 'Psicofarmacologia',
-    price: 50,
-    audience: 'Renda média',
-    careModel: 'Plano essencial',
     rating: 4.9,
     reviews: 112,
     online: true,
@@ -223,9 +166,6 @@ export const PSYCHOLOGISTS_SEED = [
     crp: 'Cert. 45678',
     specialty: 'Orientação emocional',
     approach: 'Orientação Integrativa',
-    price: 20,
-    audience: 'Baixa renda',
-    careModel: 'Atendimento social',
     rating: 4.5,
     reviews: 17,
     online: true,
@@ -242,8 +182,6 @@ export const PSYCHOLOGISTS_SEED = [
   },
 ]
 
-// Retorna profissionais do seed + profissionais cadastrados no app (AsyncStorage)
-// Usado na SearchScreen
 export function buildProfessionalFromUser(user) {
   return {
     id: `user_${user.email}`,
@@ -252,14 +190,11 @@ export function buildProfessionalFromUser(user) {
     crp: user.register_number || '—',
     specialty: user.specialty || 'Saúde mental',
     approach: user.approach || '—',
-    price: user.price || 0,
-    audience: user.audience || 'Renda média',
-    careModel: user.care_model || 'Plano essencial',
     rating: 5.0,
     reviews: 0,
     online: true,
     presential: false,
-    isNew: true,               // badge "Novo"
+    isNew: true,
     bio: user.bio || 'Profissional recém-cadastrado no Acolhe+.',
     formation: user.formation || '—',
     specialization: user.specialization || '—',
