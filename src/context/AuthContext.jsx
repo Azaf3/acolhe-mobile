@@ -69,6 +69,8 @@ export function AuthProvider({ children }) {
       accounts.push(newUser)
 
       await AsyncStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
+      await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(newUser))
+      setUser(newUser)
       return newUser
     } catch (e) {
       console.error('Erro no cadastro:', e)

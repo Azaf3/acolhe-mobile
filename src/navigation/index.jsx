@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { Feather } from '@expo/vector-icons'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
@@ -419,19 +419,21 @@ function SearchScreen({ navigation, route }) {
 
   const [registeredPros, setRegisteredPros] = React.useState([])
 
-  React.useEffect(() => {
-    async function loadPros() {
-      try {
-        const raw = await AsyncStorage.getItem('@acolhe:accounts')
-        const accounts = raw ? JSON.parse(raw) : []
-        const pros = accounts
-          .filter(a => a.role === 'profissional')
-          .map(buildProfessionalFromUser)
-        setRegisteredPros(pros)
-      } catch (e) {}
-    }
-    loadPros()
-  }, [])
+  useFocusEffect(
+    React.useCallback(() => {
+      async function loadPros() {
+        try {
+          const raw = await AsyncStorage.getItem('@acolhe:accounts')
+          const accounts = raw ? JSON.parse(raw) : []
+          const pros = accounts
+            .filter(a => a.role === 'profissional')
+            .map(buildProfessionalFromUser)
+          setRegisteredPros(pros)
+        } catch (e) {}
+      }
+      loadPros()
+    }, [])
+  )
 
   const allProfessionals = React.useMemo(
     () => [...PSYCHOLOGISTS_SEED, ...registeredPros],
@@ -744,8 +746,11 @@ function RegisterScreen({ navigation }) {
     setLoading(true)
     try {
       await register({ name: form.name, email: form.email, password: form.password, role: form.role })
-      await login({ email: form.email, password: form.password })
-    } catch (e) { } finally { setLoading(false) }
+    } catch (e) {
+      alert(e.message || 'Erro ao criar conta.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const ROLES = [
