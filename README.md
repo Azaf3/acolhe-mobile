@@ -1,73 +1,43 @@
 # Acolhe+ Mobile
 
-App mobile do Acolhe+ — migração do projeto web (React + Vite) para React Native com Expo.
+App de apoio à saúde mental comunitária: o usuário busca profissionais (psicólogos, psicanalistas, psiquiatras e outros) por especialidade, abordagem e modalidade, vê o perfil completo e solicita uma sessão.
+
+Back-end: [acolhe-back](https://github.com/Azaf3/acolhe-back)
+
+![Telas do app: início, busca e perfil do profissional](docs/screenshots.png)
+
+## Funcionalidades
+
+- **Busca com filtros** por nome, especialidade, abordagem, público e modalidade (online ou presencial)
+- **Perfil do profissional** com formação, áreas de atuação, avaliações e botão para agendar sessão
+- **Dois tipos de conta:** paciente e profissional, cada um com cadastro e login próprios
+- **Ficha do paciente** e área de perfil
+- **Sessão persistente:** o login fica salvo no aparelho com AsyncStorage
+- Navegação com abas inferiores e pilhas por seção
 
 ## Stack
 
-- **React Native** + **Expo SDK 52**
-- **@react-navigation** — navegação (Stack + Bottom Tabs)
-- **AsyncStorage** — substituiu localStorage
-- **react-native-safe-area-context** — safe areas iOS/Android
+- React Native 0.81 + Expo SDK 54
+- React Navigation (Bottom Tabs + Native Stack)
+- AsyncStorage
+- Context API para autenticação
+- Roda também na web via React Native Web
 
-## Estrutura
-
-```
-acolhe-mobile/
-├── App.jsx                        # Ponto de entrada (SafeAreaProvider + AuthProvider)
-├── app.json                       # Config Expo
-├── babel.config.js
-├── package.json
-└── src/
-    ├── theme.js                   # Equivalente às CSS variables do App.css
-    ├── context/
-    │   └── AuthContext.jsx        # Mesmo AuthContext web, localStorage → AsyncStorage
-    ├── navigation/
-    │   └── index.jsx              # RootNavigator (Tab + Stacks)
-    ├── components/
-    │   └── BottomTabBar.jsx       # Equivalente ao BottomNav.jsx web
-    ├── screens/                   # (a criar — equivalente a pages/)
-    │   ├── HomeScreen.jsx
-    │   ├── SearchScreen.jsx
-    │   ├── PsychologistScreen.jsx
-    │   ├── LoginScreen.jsx
-    │   ├── RegisterScreen.jsx
-    │   ├── ProfileScreen.jsx
-    │   └── FichaScreen.jsx
-    └── data/
-        └── psychologists.js       # Igual ao web, zero alterações
-```
-
-## Como rodar
+## Rodando localmente
 
 ```bash
 npm install
 npx expo start
 ```
 
-Depois escaneie o QR com o app **Expo Go** no celular, ou pressione:
-- `a` para Android (emulador)
-- `i` para iOS (simulador macOS)
+Escaneie o QR code com o app **Expo Go** no celular, ou pressione `a` (Android), `i` (iOS) ou `w` (navegador).
 
-## Mapeamento Web → Mobile
+## Estrutura
 
-| Web | Mobile |
-|-----|--------|
-| `<div>` / `<span>` | `<View>` / `<Text>` |
-| `<input>` | `<TextInput>` |
-| `<button onClick>` | `<TouchableOpacity onPress>` |
-| `<img src>` | `<Image source={{ uri }}>`|
-| `<form onSubmit>` | sem form, lógica no `onPress` |
-| `react-router-dom` | `@react-navigation` |
-| CSS classes | `StyleSheet.create()` |
-| CSS variables | `src/theme.js` |
-| `localStorage` | `AsyncStorage` |
-| `useNavigate` | `useNavigation` |
-| `useParams` | `useRoute().params` |
-| `<Link to>` | `navigation.navigate()` |
-
-## Próximos passos
-
-1. Copiar `src/data/psychologists.js` do projeto web (sem alterações)
-2. Criar screens uma a uma — começar por `LoginScreen` e `HomeScreen`
-3. Substituir os placeholders em `src/navigation/index.jsx` pelos imports reais
-4. Adicionar ícones com `@expo/vector-icons` no `BottomTabBar`
+```
+src/
+├── context/AuthContext.jsx   autenticação e sessão (AsyncStorage)
+├── navigation/index.jsx      telas e navegação (abas + pilhas)
+├── data/psychologists.js     base de profissionais
+└── theme.js                  cores, tipografia e espaçamentos
+```

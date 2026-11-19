@@ -494,7 +494,7 @@ function SearchScreen({ navigation, route }) {
 
       {/* Contagem */}
       <View style={ss.resultsMeta}>
-        <Text style={ss.resultsCount}>{results.length} profissional{results.length !== 1 ? 'is' : ''} encontrado{results.length !== 1 ? 's' : ''}</Text>
+        <Text style={ss.resultsCount}>{results.length} {results.length !== 1 ? 'profissionais encontrados' : 'profissional encontrado'}</Text>
         {activeCount > 0 && (
           <TouchableOpacity onPress={clearFilters}>
             <Text style={ss.clearLink}>Limpar filtros</Text>
