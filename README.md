@@ -8,7 +8,7 @@ Back-end: [acolhe-back](https://github.com/Azaf3/acolhe-back)
 
 ## Funcionalidades
 
-- **Busca com filtros** por nome, especialidade, abordagem, público e modalidade (online ou presencial)
+- **Busca com filtros** por nome, profissão, especialidade e modalidade (online ou presencial)
 - **Perfil do profissional** com formação, áreas de atuação, avaliações e botão para agendar sessão
 - **Dois tipos de conta:** paciente e profissional, cada um com cadastro e login próprios
 - **Ficha do paciente** e área de perfil
